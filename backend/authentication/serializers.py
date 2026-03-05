@@ -28,3 +28,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token['username'] = user.username
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Frontend expects { token, user }, where token is the access token.
+        data['token'] = data.get('access')
+        data['user'] = {
+            'id': self.user.id,
+            'username': self.user.username,
+        }
+        return data
